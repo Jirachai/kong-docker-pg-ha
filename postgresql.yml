@@ -1,0 +1,46 @@
+version: '3.7'
+
+services:
+  kong-database_primary:
+    image: postgres:13-alpine
+    container_name: kong-database_primary
+    #network_mode: host
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER:-kong}
+      - POSTGRES_DB=${POSTGRES_DB:-kong}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-kong}
+    volumes:
+      - ./postgres_data_primary:/var/lib/postgresql/data
+      - ./postgres.conf:/etc/postgresql/postgresql.conf
+      - ./pg_hba.conf:/etc/postgresql/pg_hba.conf
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+
+  kong-database_replica:
+    image: postgres:13-alpine
+    container_name: kong-database_replica
+    #    network_mode: host
+    ports:
+      - 5433:5432
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER:-kong}
+      - POSTGRES_DB=${POSTGRES_DB:-kong}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-kong}
+    volumes:
+      - ./postgres_data_replica:/var/lib/postgresql/data
+      - ./postgres.conf:/etc/postgresql/postgresql.conf
+      - ./pg_hba.conf:/etc/postgresql/pg_hba.conf
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+

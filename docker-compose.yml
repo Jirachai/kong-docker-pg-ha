@@ -1,0 +1,58 @@
+version: '3.7'
+
+services:
+
+  kong:
+    image: kong:3.0
+    container_name: kong
+    restart: always
+    network_mode: host
+    environment:
+      - TZ=${TZ:-Asia/Bangkok}
+      - KONG_DATABASE=postgres
+      #- KONG_PG_HOST=${KONG_PG_HOST:-kong-database}
+      - KONG_PG_HOST=127.0.0.1
+      - KONG_PG_PORT=5432
+      - KONG_PG_DATABASE=postgres
+      - KONG_PG_USER=user
+      - KONG_PG_PASSWORD=password
+      # for connect RO replica node
+      - KONG_PG_RO_HOST=127.0.0.1
+      - KONG_PG_RO_PORT=5433
+      - KONG_PG_RO_USER=user
+      - KONG_PG_RO_PASSWORD=password
+      - KONG_PG_RO_DATABASE=postgres 
+      - KONG_ADMIN_LISTEN=${KONG_ADMIN_LISTEN:-127.0.0.1:8001}
+      - KONG_PROXY_LISTEN=${KONG_PROXY_LISTEN:-0.0.0.0:8080, 0.0.0.0:8443 ssl http2}
+      - KONG_STATUS_LISTEN=127.0.0.1:8100
+      - KONG_NGINX_HTTP_RESOLVER=${KONG_NGINX_HTTP_RESOLVER:-8.8.8.8}
+      - KONG_PROXY_ERROR_LOG=/dev/stderr
+      - KONG_ADMIN_ERROR_LOG=/dev/stderr
+      - KONG_TRUSTED_IPS=0.0.0.0/0,::/0
+      - KONG_REAL_IP_RECURSIVE=on
+    ports:
+      - 172.16.101.51:8080:8080
+      - 172.16.101.51:8443:8443 
+      - 127.0.0.1:8001:8001
+    healthcheck:
+      test: ["CMD", "wget", "-O-", "http://127.0.0.1:8100/status"]
+      interval: 5s
+      timeout: 2s
+      retries: 15
+    
+  konga:
+    image: pantsel/konga
+    container_name: konga
+    restart: always
+    network_mode: host
+    environment:
+      # For use build-in filesystem db,
+      # Konga creator said `I've done it with no problems on production environments.`
+      # But the default `sails-disk` adapter is not designed for use as a production database;
+      - NODE_ENV=development
+    ports:
+      - 127.0.0.1:1337:1337
+    volumes:
+      - ./konga_data:/app/kongadata
+
+
