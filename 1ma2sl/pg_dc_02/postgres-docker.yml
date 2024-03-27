@@ -1,0 +1,40 @@
+version: '3.8'
+x-postgres-common:
+  &postgres-common
+  image: postgres:14-alpine
+  restart: always
+  healthcheck:
+    test: 'pg_isready -U user --dbname=postgres'
+    interval: 10s
+    timeout: 5s
+    retries: 5
+
+services:
+  
+
+  postgres_replica_02:
+    <<: *postgres-common
+    ports:
+      - 5433:5432
+    container_name: postgres_replica_02
+    #network_mode: host
+    environment: 
+      POSTGRES_USER: user
+      POSTGRES_DB: postgres
+      POSTGRES_PASSWORD: K0ngPG_2023
+      PGUSER: replicator
+      PGPASSWORD: replicator_password
+#    command: |
+#      bash -c "
+#      until pg_basebackup --pgdata=/var/lib/postgresql/data -R --slot=replication_slot --host=172.16.114.55 --port=5432 -X stream -P -v
+#      do
+#      echo 'Waiting for primary to connect...'
+#      sleep 1s
+#      done
+#      echo 'Backup done, starting replica...'
+#      chmod 0700 /var/lib/postgresql/data
+#      postgres
+#      " 
+    volumes:
+       - ./data_replica_02:/var/lib/postgresql/data
+ #      - ./postgresql.conf:/etc/postgresql.conf
