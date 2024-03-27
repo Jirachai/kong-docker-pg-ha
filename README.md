@@ -18,3 +18,6 @@ for deploy kong-docker with postgres DB HA
      4. Edit postgres.auto.con chang ip address of master detail 
      5. At replica create directory for pg data and chang permission that directory to 0070
      6. Up replica container and check rep status
+
+  Replica switch over step 
+  - https://medium.com/@umairhassan27/postgresql-replication-switchover-a-step-by-step-guide-d42107d860
