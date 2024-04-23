@@ -21,3 +21,5 @@ for deploy kong-docker with postgres DB HA
 
   Replica switch over step 
   - https://medium.com/@umairhassan27/postgresql-replication-switchover-a-step-by-step-guide-d42107d860
+
+    *Edit specific user at compose "user: 1004:1004" then mkdir data_replica_02 afterthat up and running container
